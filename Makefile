@@ -7,7 +7,7 @@ SRCS_DIR = ./srcs
 OBJS_DIR = ./srcs/objs
 
 # flags for linking and compiling
-LIBS = -lSDL2.dll -lglu32 -lgdi32 -lmingw32
+LIBS = -lSDL2.dll -lSDL2_image.dll -lmingw32
 LDFLAGS = -L./libs
 CPPFLAGS = -I$(SRCS_DIR) -I./includes -g
 
@@ -25,7 +25,7 @@ all: $(BIN)/$(EXEC)
 # linking program from object files
 $(BIN)/$(EXEC): $(OBJS)
 	@mkdir -p $(BIN)
-	@echo building $(EXEC)
+	@echo linking $(EXEC)
 	@$(CC) $^ -o $@ $(LDFLAGS) $(LIBS)
 
 # compiling updated source files
@@ -45,6 +45,7 @@ run: all
 clean:
 	@rm -rf $(OBJS_DIR)
 	@rm -f $(BIN)/$(EXEC)
+	@echo cleaning done
 
 # include dependencies
 -include $(DEPS)
