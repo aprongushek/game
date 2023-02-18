@@ -1,32 +1,45 @@
 #ifndef LOCATION_H
 #define LOCATION_H
 
+#define SDL_MAIN_HANDLED
+#include <SDL2/SDL.h>
+
 #include "utility.h"
+#include "renderer.h"
+#include "window.h"
 
 class Location;
 
-class Camera {
+// this class determines and draws 
+// visible area of the map
+class Scene {
 private:
-	vec2 position;
+	SDL_Rect boundary;
+	vec2 offsets;
+
 	const Location *loc;
 
 public:
-	Camera (const Location *location);
+	Scene (const Location *location);
 	
-	void SetPosition (float x, float y); // temporary function
-	const vec2 &GetPosition ();
-
 	void Update ();
+
+	// function which determines rendering logic
+	// (rendering order, screen coordinates of objects, etc)
+	void Draw ();
 };
 
-// container for the game level
+// this container stores game level
 // TODO: overall entities support 
 class Location {
 private:
 	uint sizeX;
 	uint sizeY;
 	uint **mtx;
-	Camera *camera;
+	Scene *scene;
+
+	// texture atlas with all tiles
+	Texture* atlas;
 
 	void Load (uint id);
 	void Drop ();
@@ -36,11 +49,10 @@ public:
 	Location (uint id);
 	~Location ();
 
-	friend void RenderScene (Location& loc);
+	void Update ();
+	void Draw();
+
+	friend Scene;
 };
-
-
-// defined in renderer.cpp
-void RenderScene (Location& loc);
 
 #endif

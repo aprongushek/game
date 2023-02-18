@@ -3,35 +3,52 @@
 #include <fstream>
 #include <string>
 
-#include "utility.h"
-#include "renderer.h"
-
 #define ERR_FILE_NOT_FOUND "file not found"
 
 #define LOC_PATH "data/locations/"
 #define LOC_EXT ".loc"
 
-#define MAP_THEME_ATLAS "tiles"
+#define MAP_THEME_ATLAS "atlas"
 
-// --------------<Camera Start>-------------- //
+#define FLOOR_TILE 0
+#define WALL_TILE 1
 
-Camera::Camera (const Location *location) :
-	position(vec2(0.0,0.0)), loc(location) {}
+// --------------<Scene Start>-------------- //
 
-void Camera::SetPosition (float x, float y)
+Scene::Scene (const Location *location) :
+	loc(location) 
 {
-	position.x = x;
-	position.y = y;
+	boundary.x = 0;
+	boundary.y = 0;
+	boundary.w = loc->sizeX;
+	boundary.h = loc->sizeY;
+
+	offsets.x = 10;
+	offsets.y = 80;
 }
 
-const vec2 &Camera::GetPosition ()
+void Scene::Update () {}
+
+void Scene::Draw () 
 {
-	return position;
+	for (int i = boundary.y; i < boundary.h; i++) 
+		for (int j = boundary.x; j < boundary.w; j++) 
+			if (loc->mtx[i][j] == FLOOR_TILE) 
+				loc->atlas->Draw(offsets.x+(j*TILE_SIZE),
+				                 offsets.y+(i*TILE_SIZE),
+				                 0, 0, 0.0);
+
+	// TODO: render entities
+
+	for (int i = boundary.y; i < boundary.h; i++) 
+		for (int j = boundary.x; j < boundary.w; j++) 
+			if (loc->mtx[i][j] == WALL_TILE) 
+				loc->atlas->Draw(offsets.x+(j*TILE_SIZE),
+				                 offsets.y+(i*TILE_SIZE),
+				                 1, 0, 0.0);
 }
 
-void Camera::Update () {}
-
-// ---------------<Camera End>--------------- //
+// ---------------<Scene End>--------------- //
 // -------------<Location Start>------------- //
 
 void Location::Load (uint id)
@@ -54,7 +71,7 @@ void Location::Load (uint id)
 	}
 
 	// test version of loading textures
-	LoadTexture(MAP_THEME_ATLAS, "tiles/0");
+	atlas = LoadTexture(MAP_THEME_ATLAS, "tiles/0");
 }
 
 void Location::Drop ()
@@ -69,16 +86,20 @@ void Location::Drop ()
 Location::Location (uint id)
 {
 	Load(id);
-	camera = new Camera(this);
-
-	camera->SetPosition(sizeX*TILE_SIZE / 2, 
-	                    sizeY*TILE_SIZE / 2);
+	scene = new Scene(this);
 }
 
 Location::~Location ()
 {
 	Drop();
-	delete camera;
+	delete scene;
+}
+
+void Location::Update () {}
+
+void Location::Draw ()
+{
+	scene->Draw();
 }
 
 // --------------<Location End>-------------- //

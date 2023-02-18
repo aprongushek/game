@@ -1,9 +1,5 @@
 #include "window.h"
 
-#include <string>
-
-#define SDL_MAIN_HANDLED
-#include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #define ERR_INIT_SDL "can\'t init SDL"

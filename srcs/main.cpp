@@ -28,8 +28,8 @@ int main(int argc, char* args[]) {
 				}
 			}
 	
-			RenderScene(testLoc);
-			testTex.Draw(120, 120, 0, 45);
+			testLoc.Draw();
+			testTex.DrawCentered(120, 120, 0, 0, 45);
 	
 			SDL_RenderPresent(Window::renderer);
 		}
